@@ -48,3 +48,8 @@ local.properties
 .settings/
 .loadpath
 .recommenders
+
+### Python ###
+__pycache__/
+*.pyc
+.pytest_cache/
