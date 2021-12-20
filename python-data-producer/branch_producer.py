@@ -1,52 +1,29 @@
-import sqlalchemy as db
-from sqlalchemy import text
+import requests
 from faker import Faker
 
-# specify db config
-config = {
-    'host' : 'localhost',
-    'port' : 3307,
-    'user' : 'user',
-    'password' : 'pwd',
-    'database' : 'alinedb'
-}
-
-db_user = config.get('user')
-db_pwd = config.get('password')
-db_host = config.get('host')
-db_port = config.get('port')
-db_name = config.get('database')
-
-# specify connection string
-connection_str = f'mysql+pymysql://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_name}'
-# connect to database
-engine = db.create_engine(connection_str)
-connection = engine.connect()
-
-def populate_branch(conn):
+def populate_branch(auth):
     fake = Faker()
-    # optional clear table entries
-    clear = True
-    if clear:
-        conn.execute(text('DELETE FROM branch'))
-        conn.execute(text('ALTER TABLE branch AUTO_INCREMENT = 1'))
+    register_url = 'http://localhost:8083/branches'
 
-    # create and insert X entries
-    num_entries = 10
-    for i in range(num_entries):
-        # define values to be inserted into user table
-        # id is bigInt auto-inc
-        address = fake.street_address() # varchar(255)
-        city = fake.city() # varchar(255)
-        name = fake.name() # varchar(255)
-        phone = fake.phone_number() # varchar(255) nullable
-        state = fake.state() # varchar(255) nullable
-        zipcode = fake.zipcode() # varchar(255) nullable
-        # bank_id is restricted foreign key from table 'bank'
+    branch_entries = 10
+    for i in range(branch_entries):
+        register_info = {
+            "name" : fake.name(),
+            "address" : fake.street_address(),
+            "city" : fake.city(),
+            "state" : fake.state(),
+            "zipcode" : fake.numerify('#####'),
+            "phone" : fake.numerify('(###)-###-####'),
+            "bankID" : str(i+1) # fake.numerify('%')
+        }
+        reg_branch = requests.post(register_url, json=register_info, headers=auth)
+        # print(reg_branch.text)
 
-        # create and execute insert string
-        branch_ins = text("INSERT INTO branch (address, city, name, phone, state, zipcode) VALUES (:address, :city, :name, :phone, :state, :zipcode)")
-        conn.execute(branch_ins, address=address, city=city, name=name, phone=phone, state=state, zipcode=zipcode)
-
-populate_branch(connection)
-
+# login_info = {
+#     'username' : 'adminUser',
+#     'password' : 'Password*8'
+# }
+# login_response = requests.post('http://localhost:8070/login', json=login_info)
+# bearer_token = login_response.headers['Authorization']
+# auth = {'Authorization' : bearer_token}
+# populate_branch(auth)
