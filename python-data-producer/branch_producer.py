@@ -14,7 +14,7 @@ def populate_branch(auth):
             "state" : fake.state(),
             "zipcode" : fake.numerify('#####'),
             "phone" : fake.numerify('(###)-###-####'),
-            "bankID" : str(i+1) # fake.numerify('%')
+            "bankID" : str(i+1)
         }
         reg_branch = requests.post(register_url, json=register_info, headers=auth)
         # print(reg_branch.text)

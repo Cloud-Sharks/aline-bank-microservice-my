@@ -13,7 +13,6 @@ target/
 .springBeans
 .sts4-cache
 *.properties
-application.yml
 !*-test.properties
 
 ### IntelliJ IDEA ###
@@ -53,3 +52,4 @@ local.properties
 __pycache__/
 *.pyc
 .pytest_cache/
+*_test.py
