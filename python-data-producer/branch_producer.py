@@ -1,13 +1,16 @@
 import requests
+import logging
+import os
 from faker import Faker
 
-def populate_branch(auth):
+def populate_branch(auth, branch_entries):
+    logging.basicConfig(level=logging.INFO, filename="aline_files/core-my/docker-data/aline_log.log", filemode='a', format='%(process)d - [%(levelname)s ] - %(message)s')
     fake = Faker()
-    register_url = 'http://localhost:8083/branches'
+    # branch_url = 'http://localhost:8083/branches'
+    branch_url = f"{os.environ.get('BANK_URL')}/branches"
 
-    branch_entries = 10
     for i in range(branch_entries):
-        register_info = {
+        branch_info = {
             "name" : fake.name(),
             "address" : fake.street_address(),
             "city" : fake.city(),
@@ -16,14 +19,11 @@ def populate_branch(auth):
             "phone" : fake.numerify('(###)-###-####'),
             "bankID" : str(i+1)
         }
-        reg_branch = requests.post(register_url, json=register_info, headers=auth)
-        # print(reg_branch.text)
+        logging.info(f'Trying to post {branch_info}')
+        try:
+            reg_branch = requests.post(branch_url, json=branch_info, headers=auth)
+            logging.info('Branch posted')
+        except Exception as e:
+            logging.error(f'Error entering branch: ', exc_info=True)
 
-# login_info = {
-#     'username' : 'adminUser',
-#     'password' : 'Password*8'
-# }
-# login_response = requests.post('http://localhost:8070/login', json=login_info)
-# bearer_token = login_response.headers['Authorization']
-# auth = {'Authorization' : bearer_token}
-# populate_branch(auth)
+print('', end='')
