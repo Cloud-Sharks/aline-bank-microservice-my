@@ -7,7 +7,7 @@ pipeline{
         GIT_REPO = 'https://github.com/markyates7748/aline-bank-microservice-my.git'
         REPO_BRANCH = 'dev'
         COMMIT_HASH = "${sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()}"
-        //AWS_ID = credentials('AWS_ID')
+        AWS_ID = credentials('AWS_ID')
         SERVICE_NAME = 'bank-ms'
         REGION = 'us-west-1'
         APP_NAME = 'alinefinancial-my'
@@ -20,7 +20,7 @@ pipeline{
         stage('Checkout'){
             steps{
                 //TODO: get branch
-                sh'git-force-clone -b ${REPO_BRANCH} --single-branch ${GIT_REPO}'
+                git branch: '${REPO_BRANCH}', url: '${GIT_REPO}'
             }
         }
         stage('Test'){
@@ -38,17 +38,15 @@ pipeline{
         stage('Build Image'){
             steps{
                 //TODO: build docker image
-                //sh'docker build . -t ${APP_NAME}/${APP_ENV}/${SERVICE_NAME}:${COMMIT_HASH}'
-                //sh'docker tag ${APP_NAME}/${APP_ENV}/${SERVICE_NAME}:${COMMIT_HASH} ${AWS_ID}.dkr.ecr.${REGION}.amazonaws.com/${APP_NAME}/${SERVICE_NAME}'
-                sh'docker build . -t myates7748/bank-ms:jenkinsTest'
+                sh'docker build . -t ${APP_NAME}/${APP_ENV}/${SERVICE_NAME}:${COMMIT_HASH}'
+                sh'docker tag ${APP_NAME}/${APP_ENV}/${SERVICE_NAME}:${COMMIT_HASH} ${AWS_ID}.dkr.ecr.${REGION}.amazonaws.com/${APP_NAME}/${SERVICE_NAME}'
             }
         }
         stage('Push Image'){
             steps{
                 //TODO: push image to cloud
-                //sh'aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin --password-stdin ${AWS_ID}.dkr.ecr.${REGION}.amazonaws.com'
-                //sh'docker push ${AWS_ID}.dkr.ecr.${REGION}.amazonaws.com/${APP_NAME}/${SERVICE_NAME}'
-                sh'docker push myates7748/bank-ms:jenkinsTest'
+                sh'aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin --password-stdin ${AWS_ID}.dkr.ecr.${REGION}.amazonaws.com'
+                sh'docker push ${AWS_ID}.dkr.ecr.${REGION}.amazonaws.com/${APP_NAME}/${SERVICE_NAME}'
             }
         }
     }
@@ -57,9 +55,8 @@ pipeline{
         always{
             //TODO: clean up
             sh'mvn clean'
-            //sh'docker image rm ${APP_NAME}/${APP_ENV}/${SERVICE_NAME}:${COMMIT_HASH}'
-            //sh'docker image rm ${AWS_ID}.dkr.ecr.${REGION}.amazonaws.com/${APP_NAME}/${APP_ENV}/${SERVICE_NAME}:${COMMIT_HASH}'
-            sh'docker image rm myates7748/bank-ms:jenkinsTest'
+            sh'docker image rm ${APP_NAME}/${APP_ENV}/${SERVICE_NAME}:${COMMIT_HASH}'
+            sh'docker image rm ${AWS_ID}.dkr.ecr.${REGION}.amazonaws.com/${APP_NAME}/${APP_ENV}/${SERVICE_NAME}:${COMMIT_HASH}'
         }
     }
 
