@@ -26,6 +26,7 @@ pipeline{
         stage('Test'){
             steps{
                 //TODO: run project tests
+                sh'apt-get install maven -y'
                 sh'mvn clean test'
             }
         }
