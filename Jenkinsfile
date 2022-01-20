@@ -20,7 +20,7 @@ pipeline{
         stage('Checkout'){
             steps{
                 //TODO: get branch
-                sh'git clone -b ${REPO_BRANCH} --single-branch ${GIT_REPO}'
+                sh'git -b ${REPO_BRANCH} --single-branch ${GIT_REPO}'
             }
         }
         stage('Test'){
