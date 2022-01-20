@@ -20,13 +20,12 @@ pipeline{
         stage('Checkout'){
             steps{
                 //TODO: get branch
-                git '${GIT_REPO}'
+                sh'git clone -b ${REPO_BRANCH} --single-branch ${GIT_REPO}'
             }
         }
         stage('Test'){
             steps{
                 //TODO: run project tests
-                sh'apt-get install maven -y'
                 sh'mvn clean test'
             }
         }
