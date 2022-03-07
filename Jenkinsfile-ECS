@@ -13,7 +13,7 @@ pipeline{
         stage('Checkout'){
             steps{
                 //get branch
-                git branch: 'feature', url: 'https://github.com/markyates7748/aline-bank-microservice-my.git'
+                git branch: 'dev', url: 'https://github.com/markyates7748/aline-bank-microservice-my.git'
                 sh'git submodule init'
                 sh'git submodule update'
             }
@@ -71,14 +71,15 @@ pipeline{
         }
         //deploy stage
         stage('Deploy New Image'){
-            when{
-                expression{
-                    return params.CLUSTER_UP
-                }
-            }
             steps{
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "cloudshark-Mark", accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]){
-                    sh'aws ecs update-service --cluster $ECS_CLUSTER_MY --service $SERVICE_NAME --force-new-deployment'
+                    script{
+                        try {
+                            sh'aws ecs update-service --cluster $ECS_CLUSTER_MY --service $SERVICE_NAME --force-new-deployment'
+                        } catch(Exception e){
+                            echo 'Error: ' + e.toString()
+                        }
+                    }
                 }
             }
         }
