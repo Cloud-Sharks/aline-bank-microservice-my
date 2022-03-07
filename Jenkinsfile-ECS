@@ -78,7 +78,8 @@ pipeline{
             }
             steps{
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "cloudshark-Mark", accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]){
-                    sh'aws ecs update-service --cluster $ECS_CLUSTER --service $SERVICE_NAME --force-new-deployment'
+                    //sh'aws ecs update-service --cluster $ECS_CLUSTER --service $SERVICE_NAME --force-new-deployment'
+                    sh'aws ecs register-task-definition --family $CLUSTER_NAME-$CONTAINER_NAME --cli-input-json file://ecs-task-def.json'
                 }
             }
         }
