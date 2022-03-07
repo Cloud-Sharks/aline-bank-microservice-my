@@ -1,9 +1,0 @@
-{
-    "family": "%CLUSTER_NAME%-%CONTAINER_NAME%",
-    "containerDefinitions": [
-        {
-            "image": "%AWS_ID%.dkr.ecr.us-east-1.amazonaws.com/%APP_NAME%:%COMMIT_HASH%",
-            "name": "%CONTAINER_NAME%"
-        }
-    ]
-}
