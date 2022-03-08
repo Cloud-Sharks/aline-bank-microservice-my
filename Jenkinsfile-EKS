@@ -78,7 +78,7 @@ pipeline{
                 //push image to cloud
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "cloudshark-Mark", accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]){
                     sh'aws ecr get-login-password --region $ECR_REGION | docker login --username AWS --password-stdin $AWS_ID.dkr.ecr.$ECR_REGION.amazonaws.com'
-                    sh'kubectl apply -f k8s-deploy.yml'
+                    sh'kubectl run -f k8s-deploy.yml --image ${AWS_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com/${APP_NAME}:${COMMIT_HASH}'
                 }
             }
         }
