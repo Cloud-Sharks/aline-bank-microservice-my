@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: bank-ms-my
-          image: $AWS_ID.dkr.ecr.$ECR_REGION.amazonaws.com/$APP_NAME:latest
+          image: replaceMe
           ports:
             - containerPort: 8083
           envFrom:
