@@ -13,7 +13,8 @@ pipeline{
         stage('Checkout'){
             steps{
                 //get branch
-                git branch: 'dev', url: 'https://github.com/markyates7748/aline-bank-microservice-my.git'
+                checkout([$class: 'GitSCM', 
+                    branches: [[name: env.BRANCH_MY]]])
                 sh'git submodule init'
                 sh'git submodule update'
             }
@@ -52,8 +53,8 @@ pipeline{
             }
             steps{
                 //build docker image
-                sh'docker build . -t ${AWS_ID}.dkr.ecr.us-east-1.amazonaws.com/${APP_NAME}:${COMMIT_HASH}'
-                sh'docker tag ${AWS_ID}.dkr.ecr.us-east-1.amazonaws.com/${APP_NAME}:${COMMIT_HASH} ${AWS_ID}.dkr.ecr.us-east-1.amazonaws.com/${APP_NAME}:latest'
+                sh'docker build . -t ${AWS_ID}.dkr.ecr.${ECR_REGION_MY}.amazonaws.com/${APP_NAME}:${COMMIT_HASH}'
+                sh'docker tag ${AWS_ID}.dkr.ecr.${ECR_REGION_MY}.amazonaws.com/${APP_NAME}:${COMMIT_HASH} ${AWS_ID}.dkr.ecr.${ECR_REGION_MY}.amazonaws.com/${APP_NAME}:latest'
             }
         }
         stage('Push Image'){
@@ -63,9 +64,9 @@ pipeline{
             steps{
                 //push image to cloud
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "cloudshark-Mark", accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]){
-                    sh'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $AWS_ID.dkr.ecr.us-east-1.amazonaws.com'
-                    sh'docker push ${AWS_ID}.dkr.ecr.us-east-1.amazonaws.com/${APP_NAME}:${COMMIT_HASH}'
-                    sh'docker push ${AWS_ID}.dkr.ecr.us-east-1.amazonaws.com/${APP_NAME}:latest'
+                    sh'aws ecr get-login-password --region $ECR_REGION_MY | docker login --username AWS --password-stdin $AWS_ID.dkr.ecr.$ECR_REGION_MY.amazonaws.com'
+                    sh'docker push ${AWS_ID}.dkr.ecr.${ECR_REGION_MY}.amazonaws.com/${APP_NAME}:${COMMIT_HASH}'
+                    sh'docker push ${AWS_ID}.dkr.ecr.${ECR_REGION_MY}.amazonaws.com/${APP_NAME}:latest'
                 }
             }
         }
